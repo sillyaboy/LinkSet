@@ -15,6 +15,7 @@ struct BookmarkListView: View {
     // UI 状态
     @State private var showAddLinkSheet = false
     @State private var newUrlString = ""
+    @State private var editingBookmark: BookmarkItem?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -27,6 +28,38 @@ struct BookmarkListView: View {
                         BookmarkRowView(bookmark: bookmark)
                             .listRowSeparator(.hidden) // 隐藏分割线，因为我们有卡片背景
                             .listRowInsets(EdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 10))
+                            .contentShape(Rectangle()) // 确保整个区域可点击
+                            .onTapGesture(count: 2) {
+                                if let url = bookmark.url {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }
+                            .contextMenu {
+                                Button("打开链接") {
+                                    if let url = bookmark.url {
+                                        NSWorkspace.shared.open(url)
+                                    }
+                                }
+                                
+                                Button("编辑链接") {
+                                    editingBookmark = bookmark
+                                }
+                                
+                                Button("复制链接") {
+                                    let pasteboard = NSPasteboard.general
+                                    pasteboard.clearContents()
+                                    pasteboard.setString(bookmark.urlString, forType: .string)
+                                }
+                                
+                                Divider()
+                                
+                                Button("删除", role: .destructive) {
+                                    withAnimation {
+                                        modelContext.delete(bookmark)
+                                        try? modelContext.save()
+                                    }
+                                }
+                            }
                     }
                     .onDelete(perform: deleteBookmarks)
                 }
@@ -76,6 +109,9 @@ struct BookmarkListView: View {
             }
             .padding()
             .frame(width: 350, height: 150)
+        }
+        .sheet(item: $editingBookmark) { bookmark in
+            EditLinkView(bookmark: bookmark)
         }
     }
     
@@ -130,9 +166,12 @@ struct BookmarkListView: View {
     }
 
     private func deleteBookmarks(offsets: IndexSet) {
-        let sortedBookmarks = group.bookmarks.sorted(by: { $0.createdAt > $1.createdAt })
-        for index in offsets {
-            modelContext.delete(sortedBookmarks[index])
+        withAnimation {
+            let sortedBookmarks = group.bookmarks.sorted(by: { $0.createdAt > $1.createdAt })
+            for index in offsets {
+                modelContext.delete(sortedBookmarks[index])
+            }
+            try? modelContext.save()
         }
     }
 }
