@@ -15,7 +15,6 @@ struct BookmarkListView: View {
     // UI 状态
     @State private var showAddLinkSheet = false
     @State private var newUrlString = ""
-    @State private var isFetching = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -59,7 +58,7 @@ struct BookmarkListView: View {
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 300)
                     .onSubmit {
-                        Task { await addLink() }
+                        addLink()
                     }
                 
                 HStack {
@@ -67,22 +66,16 @@ struct BookmarkListView: View {
                         .keyboardShortcut(.escape, modifiers: [])
                     
                     Button("添加") {
-                        Task { await addLink() }
+                        addLink()
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(newUrlString.isEmpty || isFetching)
+                    .disabled(newUrlString.isEmpty)
                     .keyboardShortcut(.defaultAction)
                 }
                 
-                if isFetching {
-                    HStack {
-                        ProgressView().controlSize(.small)
-                        Text("正在抓取标题和图标...").font(.caption).foregroundStyle(.secondary)
-                    }
-                }
             }
             .padding()
-            .frame(width: 350, height: 200)
+            .frame(width: 350, height: 150)
         }
     }
     
@@ -96,32 +89,43 @@ struct BookmarkListView: View {
         }
     }
 
-    private func addLink() async {
+    private func addLink() {
         guard !newUrlString.isEmpty else { return }
         
         // 自动补全 https
-        if !newUrlString.lowercased().hasPrefix("http") {
-            newUrlString = "https://" + newUrlString
+        var finalUrlString = newUrlString
+        if !finalUrlString.lowercased().hasPrefix("http") {
+            finalUrlString = "https://" + finalUrlString
         }
         
-        withAnimation { isFetching = true }
+        // 1. 立即添加到 UI (使用 URL 作为临时标题)
+        let newBookmark = BookmarkItem(urlString: finalUrlString, group: group)
+        newBookmark.title = finalUrlString // 临时标题
+        newBookmark.summary = "正在获取信息..."
+        modelContext.insert(newBookmark)
         
-        // 调用工具类抓取数据
-        let (title, summary, iconData) = await MetadataFetcher.fetchMetadata(for: newUrlString)
+        // 2. 立即关闭弹窗并重置输入
+        showAddLinkSheet = false
+        newUrlString = ""
         
-        // 回到主线程更新数据
-        await MainActor.run {
-            let newBookmark = BookmarkItem(urlString: newUrlString, group: group)
-            newBookmark.title = title ?? "无标题"
-            newBookmark.summary = summary ?? "无简介"
-            newBookmark.iconData = iconData
+        // 3. 后台异步抓取元数据并更新
+        Task {
+            // 调用工具类抓取数据
+            let (title, summary, iconData) = await MetadataFetcher.fetchMetadata(for: finalUrlString)
             
-            modelContext.insert(newBookmark)
-            
-            // 重置状态
-            isFetching = false
-            showAddLinkSheet = false
-            newUrlString = ""
+            // 回到主线程更新数据
+            await MainActor.run {
+                // 只有当数据有效时才更新，避免覆盖用户可能的手动修改（如果未来支持的话）
+                if let title = title {
+                    newBookmark.title = title
+                }
+                if let summary = summary {
+                    newBookmark.summary = summary
+                }
+                if let iconData = iconData {
+                    newBookmark.iconData = iconData
+                }
+            }
         }
     }
 
