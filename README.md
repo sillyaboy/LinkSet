@@ -1,38 +1,38 @@
 # LinkSet
 
-LinkSet is a native macOS application built with SwiftUI and SwiftData, designed to help you organize and manage your web bookmarks efficiently. It allows you to group links, preview them with rich metadata, and access them quickly via the menu bar.
+LinkSet 是一个使用 SwiftUI 和 SwiftData 构建的原生 macOS 应用程序，旨在快速打开多个链接。你可以将不同的链接进行分组，然后在菜单栏快速打开它们。
 
-## Features
+## 功能特性
 
-- **Smart Grouping**: Organize your links into custom groups.
-- **Rich Previews**: Automatically fetches and displays titles, summaries, and icons for your bookmarks.
-- **Menu Bar Access**: Quickly access your groups and open all links within a group directly from the macOS menu bar.
-- **One-Click Open**: Open all links in a group simultaneously with a single click.
-- **Optimized Performance**: Instant link addition with background metadata fetching.
-- **Native Experience**: Built with SwiftUI for a seamless macOS look and feel, supporting Dark Mode.
-- **Context Menu Actions**: Right-click to open, edit, copy, or delete links and groups.
+- **智能分组**：将您的链接组织到自定义分组中。
+- **丰富预览**：自动抓取并显示书签的标题、摘要和图标。
+- **菜单栏访问**：从 macOS 菜单栏快速查看您的分组并直接打开分组内的所有链接。
+- **一键打开**：只需单击一次即可同时打开分组内的所有链接。
+- **性能优化**：支持后台元数据抓取，实现即时添加链接体验。
+- **原生体验**：使用 SwiftUI 构建，拥有流畅的 macOS 外观和感觉，完美支持深色模式。
+- **上下文菜单操作**：右键单击即可打开、编辑、复制或删除链接和分组。
 
-## Tech Stack
+## 技术栈
 
-- **Language**: Swift 5.9+
-- **UI Framework**: SwiftUI
-- **Data Persistence**: SwiftData
-- **Platform**: macOS 14.0+ (Sonoma)
+- **语言**：Swift 5.9+
+- **UI 框架**：SwiftUI
+- **数据持久化**：SwiftData
+- **平台**：macOS 14.0+ (Sonoma)
 
-## Installation
+## 安装说明
 
-1. Clone the repository.
-2. Open `LinkSet.xcodeproj` in Xcode 15 or later.
-3. Ensure the deployment target is set to macOS 14.0 or higher.
-4. Build and Run (Command+R).
+1. 克隆仓库。
+2. 使用 Xcode 15 或更高版本打开 `LinkSet.xcodeproj`。
+3. 确保部署目标设置为 macOS 14.0 或更高版本。
+4. 构建并运行 (Command+R)。
 
-## Usage
+## 使用指南
 
-- **Add Group**: Click the "New Group" button in the toolbar or sidebar.
-- **Add Link**: Select a group and click the "+" button to add a URL.
-- **Edit/Delete**: Right-click on any group or link to access management options.
-- **Menu Bar**: Click the LinkSet icon in the status bar to see your groups and quick-open links.
+- **添加分组**：点击工具栏或侧边栏中的"新建分组"按钮。
+- **添加链接**：选择一个分组，然后点击"+"按钮添加 URL。
+- **编辑/删除**：右键单击任何分组或链接以访问管理选项。
+- **菜单栏**：点击状态栏中的 LinkSet 图标即可查看您的分组并快速打开链接。
 
-## License
+## 许可证
 
-This project is licensed under the MIT License.
+本项目采用 MIT 许可证。
