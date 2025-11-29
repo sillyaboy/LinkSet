@@ -1,5 +1,7 @@
 # LinkSet
 
+<img width="128px" src="https://media-1253783052.cos.ap-guangzhou.myqcloud.com/zncm1f.png" alt="Logo" align="left" />
+
 LinkSet 是一个使用 SwiftUI 和 SwiftData 构建的原生 macOS 应用程序，旨在快速打开多个链接。你可以将不同的链接进行分组，然后在菜单栏快速打开它们。
 
 ## 功能特性
