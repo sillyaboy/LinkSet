@@ -16,6 +16,10 @@ struct ContentView: View {
     @State private var selectedGroup: BookmarkGroup?
     @State private var showAddGroupAlert = false
     @State private var newGroupName = ""
+    
+    @State private var showRenameGroupAlert = false
+    @State private var groupToRename: BookmarkGroup?
+    @State private var renameGroupName = ""
 
     var body: some View {
         NavigationSplitView {
@@ -27,6 +31,17 @@ struct ContentView: View {
                             HStack {
                                 Image(systemName: "folder")
                                 Text(group.name)
+                            }
+                        }
+                        .contextMenu {
+                            Button("重命名") {
+                                groupToRename = group
+                                renameGroupName = group.name
+                                showRenameGroupAlert = true
+                            }
+                            
+                            Button("删除", role: .destructive) {
+                                modelContext.delete(group)
                             }
                         }
                     }
@@ -44,11 +59,21 @@ struct ContentView: View {
             }
             .alert("新建分组", isPresented: $showAddGroupAlert) {
                 TextField("分组名称", text: $newGroupName)
-                Button("取消", role: .cancel) { newGroupName = "" }
+                Button("取消", role: .cancel) { }
                 Button("创建") {
                     addGroup()
-                    newGroupName = ""
                 }
+                .disabled(newGroupName.isEmpty)
+            }
+            .alert("重命名分组", isPresented: $showRenameGroupAlert) {
+                TextField("新名称", text: $renameGroupName)
+                Button("取消", role: .cancel) { }
+                Button("保存") {
+                    if let group = groupToRename, !renameGroupName.isEmpty {
+                        group.name = renameGroupName
+                    }
+                }
+                .disabled(renameGroupName.isEmpty)
             }
             
         } detail: {
